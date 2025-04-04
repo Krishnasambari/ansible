@@ -1,0 +1,47 @@
+---
+- name: Check and update a file on destination
+  hosts: [webservers]  # Assuming you want to run this on the local machine, you can change this as needed
+  become: true  # Use sudo if necessary
+  vars_prompt:
+    - name: "source_path"
+      prompt: "Enter the source file path"
+      private: no  # This will display the input (if you want it hidden, set it to `yes`)
+
+    - name: "dest_path"
+      prompt: "Enter the destination path"
+      private: no  # Display the input, set to `yes` to hide it
+
+    - name: "filename"
+      prompt: "Enter the file name"
+      private: no  # Display the input, set to `yes` to hide it
+
+  tasks:
+
+    - name: Check if the file exists at destination
+      stat:
+        path: "{{ dest_path }}/{{ filename }}"
+      register: file_stat
+
+    - name: Display message if file exists and replace it
+      debug:
+        msg: "File '{{ filename }}' exists and is being replaced with the new file."
+      when: file_stat.stat.exists
+
+    - name: Replace the file if it exists
+      copy:
+        src: "{{ source_path }}/{{ filename }}"
+        dest: "{{ dest_path }}/{{ filename }}"
+        force: yes  # Ensures the file is replaced
+        remote_src: no  # Tells Ansible the source file is on the local machine
+      when: file_stat.stat.exists
+
+    - name: Warn if file does not exist, and copy the new file
+      debug:
+        msg: "File '{{ filename }}' does not exist, copying the new file."
+      when: not file_stat.stat.exists
+
+    - name: Copy the new file if it does not exist
+      copy:
+        src: "{{ source_path }}/{{ filename }}"
+        dest: "{{ dest_path }}/{{ filename }}"
+"updatefile.yml" 50L, 1801B                                 
