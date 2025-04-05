@@ -1,6 +1,6 @@
 ---
 - name: Check and update a file on destination
-  hosts: [webservers]  # Assuming you want to run this on the local machine, you can change this as needed
+  hosts: [webservers]  # Assuming you want to run this on the webserver group machine, you can change this as needed
   become: true  # Use sudo if necessary
   vars_prompt:
     - name: "source_path"
